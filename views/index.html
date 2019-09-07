@@ -115,19 +115,18 @@
       crossorigin="anonymous"
     ></script>
     <script>
+      //1st form vars
       let stockName = "";
-
-      //let stockName = 'goog'
       let likeOrNot = "";
 
-      //let likeOrNot = '&like=true'
-
-    
-
-      //let myURL_2 = new URL(``)
-
+      //2nd form vars
+      let stock_1 = "";
+      let stock_2 ='';
+      let likeOrNot_2nd = ''
       let jsonResult = document.getElementById("jsonResult");
 
+
+      //1st form
       document.getElementById("testForm").onsubmit = function(e) {
         e.preventDefault();
 
@@ -155,6 +154,38 @@
             jsonResult.innerText = stringified;
           });
       };
+
+      //2nd form
+      document.getElementById("testForm2").onsubmit = function(e) {
+        e.preventDefault();
+
+       stock_1 = document.getElementById("2nd_input_1").value;
+       stock_2 = document.getElementById("2nd_input_2").value;
+     
+
+        if (document.getElementById("2nd_checkbox").checked == true) {
+          likeOrNot_2nd = "&like=true";
+        } else {
+          likeOrNot_2nd = "";
+        }
+
+        let myURL_2 = new URL(
+          /////test
+          `${location.origin}/api/stock-prices?stock=${stock_1}&stock=${stock_2}${likeOrNot_2nd}`
+        );
+
+      
+
+        fetch(myURL_2)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            let stringified = JSON.stringify(data);
+            jsonResult.innerText = stringified;
+          });
+      };
+
+
 
       //document.getElementById('testForm2').submit(function (e) {
       //  e.preventDefault();
