@@ -16,9 +16,12 @@
   </head>
   <body>
     <header>
-      <h1>
-        ISQA_5 - Nasdaq Stock Price Checker
+      <h1 style="text-align: center">
+        Stock Price Checker
       </h1>
+      <h3 style="color: darkgray; text-align: center">
+        FreeCodeCamp Apis And Microservices Project 04
+      </h3>
     </header>
     <div id="userstories" style="margin-left: 5%; margin-top: 5%">
       <h3>User Stories</h3>
@@ -121,10 +124,9 @@
 
       //2nd form vars
       let stock_1 = "";
-      let stock_2 ='';
-      let likeOrNot_2nd = ''
+      let stock_2 = "";
+      let likeOrNot_2nd = "";
       let jsonResult = document.getElementById("jsonResult");
-
 
       //1st form
       document.getElementById("testForm").onsubmit = function(e) {
@@ -144,8 +146,6 @@
           `${location.origin}/api/stock-prices?stock=${stockName}${likeOrNot}`
         );
 
-      
-
         fetch(myURL)
           .then(res => res.json())
           .then(data => {
@@ -159,9 +159,8 @@
       document.getElementById("testForm2").onsubmit = function(e) {
         e.preventDefault();
 
-       stock_1 = document.getElementById("2nd_input_1").value;
-       stock_2 = document.getElementById("2nd_input_2").value;
-     
+        stock_1 = document.getElementById("2nd_input_1").value;
+        stock_2 = document.getElementById("2nd_input_2").value;
 
         if (document.getElementById("2nd_checkbox").checked == true) {
           likeOrNot_2nd = "&like=true";
@@ -174,8 +173,6 @@
           `${location.origin}/api/stock-prices?stock=${stock_1}&stock=${stock_2}${likeOrNot_2nd}`
         );
 
-      
-
         fetch(myURL_2)
           .then(res => res.json())
           .then(data => {
@@ -184,8 +181,6 @@
             jsonResult.innerText = stringified;
           });
       };
-
-
 
       //document.getElementById('testForm2').submit(function (e) {
       //  e.preventDefault();
