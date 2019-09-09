@@ -1,9 +1,7 @@
 /*
- *
- *
+
  *       Complete the API routing below
- *
- *
+
  */
 
 "use strict";
@@ -16,7 +14,7 @@ const iex = require("iexcloud_api_wrapper");
 
 dotenv.config();
 
-const CONNECTION_STRING = process.env.DB; //MongoClient.connect(CONNECTION_STRING, function(err, db) {});
+const CONNECTION_STRING = process.env.DB;
 
 //connection to DB
 mongoose
@@ -34,7 +32,7 @@ function quote(sym) {
 quote("WDC")
 */
 
-// testing iex_wrapper
+// testing iex_api_wrapper
 
 const quote = async sym => {
   try {
@@ -74,17 +72,13 @@ module.exports = function(app) {
   const Stock = mongoose.model("Stock", StockSchema);
 
   app.route("/api/stock-prices").get(function(req, res) {
-    //var ip = req.header('x-forwarded-for') || req.connection.remoteAddress;
-    //console.log('ippppppp')
-    //console.log(ip);
-
     var ip = req.header("x-forwarded-for") || req.connection.remoteAddress;
 
-    console.log("ip222222");
+    console.log("ip:");
     console.log(ip);
 
     let stock = req.query.stock;
-    console.log("stoooooooooooooooooock");
+    console.log("stock/stocks:");
     console.log(stock);
 
     let likeAll = req.query.like;
@@ -95,24 +89,14 @@ module.exports = function(app) {
     typeof stock === "string"
       ? arrayOfStocks.push(stock)
       : (arrayOfStocks = stock);
-    // console.log('arrayofStocks')
-    //console.log(arrayOfStocks[0]);
 
-    // this is a var! so it has to be above a function call
-    //arguments: 1: array of stocks, 2: index for the specific stock in an array
+    // quoteData is a var! so it has to be above a function call
+    //arguments: 1: array of stocks (with one or more elements), 2: index for the specific stock in an array
     async function quoteJSON(arrayOfSymbols, el) {
       try {
         const quoteData = await iex.quote(arrayOfSymbols[el]);
-        // do something with returned quote data
-
-        // console.log(quoteData);
-        //console.log(arrayOfSymbols[el]);
-
-        //////// !!!!!
 
         let myPromise = new Promise((resolve, reject) => {
-          //let exportVar ='kkkjjjjk';
-
           Stock.countDocuments(
             {
               //toUpperCase to make it work with API
@@ -120,8 +104,6 @@ module.exports = function(app) {
             },
             function(err, count) {
               if (err) console.error(err);
-              //console.log(typeof data)
-              //console.log(count);
 
               //if there is a stock in a db
               if (count > 0) {
@@ -138,24 +120,16 @@ module.exports = function(app) {
                       likes: data.likes
                     };
 
-                    // this will be what the function returns
+                    // this will be what the function quoteData returns
                     resolve(toAddToFinalArray);
                   });
                   // if the like is 'true'
                 } else {
-                  //  console.log(likeAll);
-
-                  //////
-                  //////
-                  //IP logic!
-                  //
-                  ///
-
                   Stock.findOne({
                     stock: arrayOfSymbols[el].toUpperCase()
                   }).exec((err, data) => {
                     if (err) console.error(err);
-
+                    //checking if the Ips array includes ip
                     if (data.Ips.includes(ip)) {
                       let toAddToFinalArray = {
                         stock: data.stock,
@@ -164,10 +138,8 @@ module.exports = function(app) {
                       };
 
                       resolve(toAddToFinalArray);
+                      //if there is no ip in Ips array
                     } else {
-                      ////////!!!!!/////////////////////
-
-                      /////////////////
                       Stock.findOneAndUpdate(
                         { stock: arrayOfSymbols[el].toUpperCase() },
                         {
@@ -180,13 +152,9 @@ module.exports = function(app) {
                         }
                       ).exec((err, data) => {
                         //if (err) console.error(err);
-                        //console.log(data);
-                        //res.json({
-                        // random: 'random'
-                        //stock: data.stock,
-                        //price: quoteData.latestPrice.toString(),
-                        //likes: data.likes
-                        //});
+
+                        // !! for some reason findOneandUpdate doesn't return anything, even
+                        //though it is updating, so .findOne() is chained to return data !!
 
                         Stock.findOne({
                           stock: arrayOfSymbols[el].toUpperCase()
@@ -203,10 +171,6 @@ module.exports = function(app) {
                           resolve(toAddToFinalArray);
                         });
                       });
-                      // hack!!!, because findOneandUpdate doesn't return anything, even
-                      //though it is updating, so .findOne() is chained to return data
-
-                      ////////////////////!!!!!!!!////////////////
                     }
                   });
                 }
@@ -214,7 +178,6 @@ module.exports = function(app) {
                 // if there is no stock in a db
 
                 //if there are no likes
-
                 if (likeAll !== "true") {
                   let newStock = new Stock({
                     stock: quoteData.symbol,
@@ -231,7 +194,6 @@ module.exports = function(app) {
                     likes: 0
                   };
 
-                  //finalArrayOfResJSON.push(toAddToFinalArray);
                   resolve(toAddToFinalArray);
 
                   //if there is a like & no stock in db
@@ -254,7 +216,6 @@ module.exports = function(app) {
                     likes: 1
                   };
 
-                  //finalArrayOfResJSON.push(toAddToFinalArray);
                   resolve(toAddToFinalArray);
                 }
               }
@@ -264,33 +225,26 @@ module.exports = function(app) {
 
         let myReturn = await myPromise;
         return myReturn;
-
-        //return testVar;
-
-        //return expVar;
       } catch (err) {
         console.error(err);
       }
     }
 
-    //finalVar()
-
     async function makeJsonArray() {
       let arrayOfPartials = [];
-      // console.log("arrayOfPartials");
+      // console.log("arrayOfPartials:");
       //console.log(arrayOfPartials);
 
       // for each Stock we run function quoteJson
       for (let el of arrayOfStocks) {
-        //this will return toAddToFinalArray var from quote function
+        //this will return toAddToFinalArray var from quoteJSON function
         let promise = new Promise((resolve, reject) => {
           resolve(quoteJSON(arrayOfStocks, arrayOfStocks.indexOf(el)));
         });
 
-        //let partialObj = await quoteJSON(arrayOfStocks, arrayOfStocks.indexOf(el));
         let partialObj = await promise;
-        //let partialObj = await quoteJSON(arrayOfStocks, arrayOfStocks[0]);
-        console.log("partialObj");
+
+        console.log("partialObj:");
         console.log(partialObj);
         arrayOfPartials.push(partialObj);
       }
