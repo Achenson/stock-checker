@@ -22,6 +22,10 @@ chai.use(chaiHttp);
         .get('/api/stock-prices')
         .query({stock: 'goog'})
         .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.equal(res.body[0].stock, "GOOG");
+
           
           //complete this one too
           
@@ -31,7 +35,7 @@ chai.use(chaiHttp);
       
       it('1 stock with like', function(done) {
 
-        
+
         
       });
       
