@@ -34,12 +34,43 @@ chai.use(chaiHttp);
       });
       
       it('1 stock with like', function(done) {
+        chai.request(server)
+        .get('/api/stock-prices')
+        .query({stock: 'goog'})
+        .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.equal(res.body[0].stock, "GOOG");
+
+
+          
+          //complete this one too
+          
+          done();
+        });
+
 
 
         
       });
       
       it('1 stock with like again (ensure likes arent double counted)', function(done) {
+        chai.request(server)
+        .get('/api/stock-prices')
+        .query({stock: 'goog'})
+        .end(function(err, res){
+            assert.equal(res.status, 200);
+            assert.equal(res.type, "application/json");
+            assert.equal(res.body[0].stock, "GOOG");
+            assert.equal(res.body[0].likes, 1)
+
+
+          
+          //complete this one too
+          
+          done();
+        });
+
         
       });
       
